@@ -1,83 +1,36 @@
-// player
-var music = document.querySelector('.music-element')
-var playBtn = document.querySelector('.play')
-var seekbar = document.querySelector('.seekbar')
-var currentTime = document.querySelector('.current-time')
-var duration = document.querySelector('.duration')
+document.getElementById("song").style.display = "none";
+const textEl = document.getElementById('text')
+let text = 'ehi, sei sei qui sono morto\n mi dispiace che sia finita\n spero che tu stia bene\n lo spero davvero'
 
-function handlePlay() {
-    if (music.paused) {
-        music.play();
-        playBtn.className = 'pause'
-        playBtn.innerHTML = '<i class="material-icons">pause</i>'
-    } else {
-        music.pause();
-        playBtn.className = 'play'
-        playBtn.innerHTML = '<i class="material-icons">play_arrow</i>'
+let idx = 1
+let speed = 100
+let counter = 0
+writeText()
+ 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function writeText() {
+    textEl.innerText = text.slice(0, idx)
+    idx++
+    if(idx > text.length && counter==0) {
+        await sleep(2000);
+        counter = 1
+        for(let i = idx; i>0; i--){
+            textEl.innerText = textEl.innerText.slice(0, textEl.innerText.length - 1);
+            await sleep(100) 
+        }
+        text="FANTASMI"
+        idx=0
     }
-    music.addEventListener('ended', function () {
-        playBtn.className = 'play'
-        playBtn.innerHTML = '<i class="material-icons">play_arrow</i>'
-        music.currentTime = 0
-    });
-}
-
-music.onloadeddata = function () {
-    seekbar.max = music.duration
-    var ds = parseInt(music.duration % 60)
-    var dm = parseInt((music.duration / 60) % 60)
-    duration.innerHTML = dm + ':' + ds
-}
-music.ontimeupdate = function () { seekbar.value = music.currentTime }
-handleSeekBar = function () { music.currentTime = seekbar.value }
-music.addEventListener('timeupdate', function () {
-    var cs = parseInt(music.currentTime % 60)
-    var cm = parseInt((music.currentTime / 60) % 60)
-    currentTime.innerHTML = cm + ':' + cs
-}, false)
-
-
-// like
-var favIcon = document.querySelector('.favorite')
-function handleFavorite() {
-    window.open('https://www.instagram.com/bbjohansucks/', '_blank').focus();
-
-}
-
-
-// repeat
-var repIcon = document.querySelector('.repeat')
-function handleRepeat() {
-    if (music.loop == true) {
-        music.loop = false
-        repIcon.classList.toggle('active')
+    if(idx > text.length && counter==1) {
+        await sleep(2000);
+        document.getElementById('text').hidden = true
+        //document.getElementById("song").style.display = "block";
+        var audio = new Audio("outro.mp3")
+        audio.play()
+        return 
     }
-    else {
-        music.loop = true
-        repIcon.classList.toggle('active')
-    }
-}
-
-// volume
-var volIcon = document.querySelector('.volume')
-var volBox = document.querySelector('.volume-box')
-var volumeRange = document.querySelector('.volume-range')
-var volumeDown = document.querySelector('.volume-down')
-var volumeUp = document.querySelector('.volume-up')
-
-function handleVolume() {
-    volIcon.classList.toggle('active')
-    volBox.classList.toggle('active')
-}
-
-volumeDown.addEventListener('click', handleVolumeDown);
-volumeUp.addEventListener('click', handleVolumeUp);
-
-function handleVolumeDown() {
-    volumeRange.value = Number(volumeRange.value) - 20
-    music.volume = volumeRange.value / 100
-}
-function handleVolumeUp() {
-    volumeRange.value = Number(volumeRange.value) + 20
-    music.volume = volumeRange.value / 100
+    setTimeout(writeText, speed)
 }
